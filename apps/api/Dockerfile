@@ -4,6 +4,7 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /app
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY packages ./packages
+COPY extensions ./extensions
 COPY apps/api ./apps/api
 RUN pnpm install --frozen-lockfile
 WORKDIR /app/apps/api
