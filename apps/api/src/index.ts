@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm'
 import { db } from './db'
 import { sources, libraryEntries } from './db/schema'
 import { loader } from './extensions/loader'
+import type { Page } from '@manga/shared'
 
 const app = Fastify({ logger: true })
 await app.register(cors, { origin: true })
@@ -31,6 +32,7 @@ app.get('/api/library', async () => db.select().from(libraryEntries))
 
 const MangaIdParams = z.object({ mangaId: z.string().min(1) })
 const IdQuery = z.object({ id: z.string().min(1) })
+const MangaFireImageQuery = z.object({ source: z.literal('mangafire'), url: z.string().url() })
 
 app.post('/api/library/:mangaId', async (req, reply) => {
   const { mangaId } = MangaIdParams.parse(req.params)
@@ -78,8 +80,28 @@ app.get('/api/chapters/pages', async (req) => {
   const { id } = IdQuery.parse(req.query)
   const sourceId = id.split(':', 1)[0]
   const mangaId = id.slice(0, id.lastIndexOf(':'))
-  const pages = await loader.call(sourceId, 'pages', [{ id, mangaId, name: id, url: '' }])
-  return { chapterId: id, pages }
+  const pages = await loader.call<Page[]>(sourceId, 'pages', [{ id, mangaId, name: id, url: '' }])
+  const readerPages = sourceId === 'mangafire'
+    ? pages.map((page: { imageUrl: string }) => ({ ...page, imageUrl: `/api/images?source=mangafire&url=${encodeURIComponent(page.imageUrl)}`, headers: undefined }))
+    : pages
+  return { chapterId: id, pages: readerPages }
+})
+
+app.get('/api/images', async (req, reply) => {
+  const { url } = MangaFireImageQuery.parse(req.query)
+  const imageUrl = new URL(url)
+  if (!imageUrl.hostname.endsWith('.mfcdn1.xyz')) return reply.code(400).send({ error: 'image_host_not_allowed' })
+  const response = await fetch(imageUrl, {
+    headers: {
+      Referer: 'https://mangafire.to/',
+      'User-Agent': process.env.MANGAFIRE_USER_AGENT ?? 'Mangrove/0.1 (+self-hosted manga library)',
+    },
+    signal: AbortSignal.timeout(30_000),
+  })
+  if (!response.ok) return reply.code(response.status).send({ error: 'image_fetch_failed' })
+  reply.header('Cache-Control', 'public, max-age=3600')
+  reply.type(response.headers.get('content-type') ?? 'application/octet-stream')
+  return reply.send(Buffer.from(await response.arrayBuffer()))
 })
 
 // ---------- Downloads (stub) ----------

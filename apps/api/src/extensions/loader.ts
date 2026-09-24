@@ -8,7 +8,8 @@ type SourceModule = { manifest: SourceManifest; modulePath: string }
 const sourceModules: SourceModule[] = [
   { manifest: SourceManifestSchema.parse({ id: 'demo', name: 'Demo Library', lang: 'it', baseUrl: 'https://demo.local', version: '1.0.0', allowedHosts: ['demo.local'] }), modulePath: fileURLToPath(new URL('./demo.ts', import.meta.url)) },
   { manifest: SourceManifestSchema.parse({ id: 'mangaworld', name: 'MangaWorld', lang: 'it', baseUrl: 'https://www.mangaworld.mx', version: '0.1.0', allowedHosts: ['www.mangaworld.mx', 'cdn.mangaworld.mx'] }), modulePath: fileURLToPath(new URL('../../../../extensions/mangaworld/src/index.ts', import.meta.url)) },
-  { manifest: SourceManifestSchema.parse({ id: 'mangafire', name: 'MangaFire', lang: 'en', baseUrl: 'https://mangafire.to', version: '0.1.0', allowedHosts: ['mangafire.to', 's.mfcdn.nl', 'i.mfcdn.nl'] }), modulePath: fileURLToPath(new URL('../../../../extensions/mangafire/src/index.ts', import.meta.url)) },
+  { manifest: SourceManifestSchema.parse({ id: 'mangafire', name: 'MangaFire', lang: 'en', baseUrl: 'https://mangafire.to', version: '0.1.0', allowedHosts: ['mangafire.to', 's.mfcdn.nl', 'i.mfcdn.nl', '*.mfcdn1.xyz'] }), modulePath: fileURLToPath(new URL('../../../../extensions/mangafire/src/index.ts', import.meta.url)) },
+  { manifest: SourceManifestSchema.parse({ id: 'atsu', name: 'Atsumaru', lang: 'en', baseUrl: 'https://atsu.moe', version: '0.1.0', allowedHosts: ['atsu.moe', 'cdn.atsu.moe'] }), modulePath: fileURLToPath(new URL('../../../../extensions/atsu/src/index.ts', import.meta.url)) },
 ]
 
 const timeoutMs = 8_000

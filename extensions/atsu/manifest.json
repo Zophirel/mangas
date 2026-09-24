@@ -1,0 +1,9 @@
+{
+  "id": "atsu",
+  "name": "Atsumaru",
+  "lang": "en",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "baseUrl": "https://atsu.moe",
+  "permissions": { "network": ["atsu.moe", "cdn.atsu.moe"], "filesystem": false }
+}

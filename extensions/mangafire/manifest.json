@@ -5,5 +5,5 @@
   "version": "0.1.0",
   "entry": "dist/index.js",
   "baseUrl": "https://mangafire.to",
-  "permissions": { "network": ["mangafire.to", "*.mfcdn.nl"], "filesystem": false }
+  "permissions": { "network": ["mangafire.to", "*.mfcdn.nl", "*.mfcdn1.xyz"], "filesystem": false }
 }
