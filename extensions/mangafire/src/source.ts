@@ -36,16 +36,17 @@ function signedUrl(path: string, params: Record<string, string> = {}) {
 async function api<T>(path: string, params: Record<string, string> = {}): Promise<T> {
   const url = signedUrl(path, params)
   const headers = { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', Referer: `${baseUrl}/`, 'User-Agent': process.env.MANGAFIRE_USER_AGENT ?? 'Mangrove/0.1 (+self-hosted manga library)' }
-  // Prefer FlareSolverr for MangaFire when configured: its VRF API is commonly
-  // challenged even when the signature is valid. Keep direct access as fallback
-  // for installs that haven't enabled a solver.
   const flareSolverrUrl = process.env.MANGAFIRE_FLARESOLVERR_URL || process.env.FLARESOLVERR_URL
-  if (flareSolverrUrl) return await apiViaFlareSolverr<T>(url, headers, flareSolverrUrl)
-  const response = await fetch(url, { headers, signal: AbortSignal.timeout(15_000) })
-  if (!response.ok) {
-    throw new Error(response.status === 403 ? 'mangafire_vrf_or_cloudflare_rejected' : `mangafire_http_${response.status}`)
+  try {
+    const response = await fetch(url, { headers, signal: AbortSignal.timeout(15_000) })
+    if (!response.ok) {
+      throw new Error(response.status === 403 ? 'mangafire_vrf_or_cloudflare_rejected' : `mangafire_http_${response.status}`)
+    }
+    return await response.json() as T
+  } catch (error) {
+    if (!flareSolverrUrl) throw error
+    return await apiViaFlareSolverr<T>(url, headers, flareSolverrUrl)
   }
-  return await response.json() as T
 }
 
 async function apiViaFlareSolverr<T>(url: URL, headers: Record<string, string>, solverUrl: string): Promise<T> {
