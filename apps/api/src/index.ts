@@ -30,7 +30,7 @@ app.get('/api/sources', async () => loader.list().map((source) => ({ ...source, 
 app.get('/api/library', async () => db.select().from(libraryEntries))
 
 const MangaIdParams = z.object({ mangaId: z.string().min(1) })
-const IdParams = z.object({ id: z.string().min(1) })
+const IdQuery = z.object({ id: z.string().min(1) })
 
 app.post('/api/library/:mangaId', async (req, reply) => {
   const { mangaId } = MangaIdParams.parse(req.params)
@@ -61,21 +61,21 @@ app.get('/api/manga', async (req) => {
   return loader.call(sourceId, 'search', [params.query ?? '', params.page])
 })
 
-app.get('/api/manga/:id', async (req) => {
-  const { id } = IdParams.parse(req.params)
+app.get('/api/manga/details', async (req) => {
+  const { id } = IdQuery.parse(req.query)
   const sourceId = id.split(':', 1)[0]
   return loader.call(sourceId, 'details', [{ id, sourceId, title: '', url: '', genres: [] }])
 })
 
-app.get('/api/manga/:id/chapters', async (req) => {
-  const { id } = IdParams.parse(req.params)
+app.get('/api/manga/chapters', async (req) => {
+  const { id } = IdQuery.parse(req.query)
   const sourceId = id.split(':', 1)[0]
   const items = await loader.call<unknown[]>(sourceId, 'chapters', [{ id, sourceId, title: '', url: '', genres: [] }])
   return { mangaId: id, items }
 })
 
-app.get('/api/chapters/:id/pages', async (req) => {
-  const { id } = IdParams.parse(req.params)
+app.get('/api/chapters/pages', async (req) => {
+  const { id } = IdQuery.parse(req.query)
   const sourceId = id.split(':', 1)[0]
   const mangaId = id.slice(0, id.lastIndexOf(':'))
   const pages = await loader.call(sourceId, 'pages', [{ id, mangaId, name: id, url: '' }])

@@ -83,7 +83,7 @@ function openManga(id: string) { chapterItems.value = []; chapterError.value = '
 function continueReading(item: Manga) { go('reader', item.id) }
 async function fetchMangaDetails(id: string) {
   try {
-    const response = await fetch(`/api/manga/${encodeURIComponent(id)}`)
+    const response = await fetch(`/api/manga/details?id=${encodeURIComponent(id)}`)
     const body = await response.json()
     if (!response.ok) throw new Error(body.message ?? body.error ?? 'Impossibile caricare i dettagli del manga.')
     const item = mapApiManga(body)
@@ -100,7 +100,7 @@ async function fetchChapters(id: string): Promise<Chapter[]> {
   chaptersLoading.value = true
   chapterError.value = ''
   try {
-    const response = await fetch(`/api/manga/${encodeURIComponent(id)}/chapters`)
+    const response = await fetch(`/api/manga/chapters?id=${encodeURIComponent(id)}`)
     const body = await response.json()
     if (!response.ok) throw new Error(body.message ?? body.error ?? 'Impossibile caricare i capitoli.')
     const items = (body.items ?? []) as Chapter[]
@@ -121,7 +121,7 @@ async function fetchChapterPages(chapter: Chapter) {
   currentPageIndex.value = 0
   activeChapter.value = chapter
   try {
-    const response = await fetch(`/api/chapters/${encodeURIComponent(chapter.id)}/pages`)
+    const response = await fetch(`/api/chapters/pages?id=${encodeURIComponent(chapter.id)}`)
     const body = await response.json()
     if (!response.ok) throw new Error(body.message ?? body.error ?? 'Impossibile caricare le pagine.')
     readerPages.value = (body.pages ?? []) as ReaderPage[]
