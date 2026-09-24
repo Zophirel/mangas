@@ -21,7 +21,7 @@ export class SourceLoader {
   async call<T>(sourceId: string, method: Method, args: unknown[]): Promise<T> {
     const selected = source(sourceId)
     return await new Promise<T>((resolve, reject) => {
-      const worker = new Worker(new URL('./source-worker.ts', import.meta.url), { workerData: { modulePath: selected.modulePath }, execArgv: ['--loader', 'tsx'] })
+      const worker = new Worker(new URL('./source-worker-bootstrap.mjs', import.meta.url), { workerData: { modulePath: selected.modulePath } })
       const callTimeoutMs = ['mangaworld', 'mangafire'].includes(selected.manifest.id) && (process.env.FLARESOLVERR_URL || process.env.MANGAWORLD_FLARESOLVERR_URL || process.env.MANGAFIRE_FLARESOLVERR_URL)
         ? 110_000
         : timeoutMs
