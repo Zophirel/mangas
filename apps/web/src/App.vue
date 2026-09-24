@@ -81,8 +81,8 @@ const navItems: { label: string; icon: string; view: View }[] = [
 const catalogItems = computed(() => catalogLoaded.value ? remoteManga.value : filteredManga.value)
 const sourceName = computed(() => ({ mangaworld: 'MangaWorld', mangafire: 'MangaFire', atsu: 'Atsumaru' })[selectedSource.value])
 async function renderDearFlip() {
-  if (pageMode.value !== 'double' || !dearFlipElement.value || !readerPages.value.length) return
   await nextTick()
+  if (pageMode.value !== 'double' || !dearFlipElement.value || !readerPages.value.length) return
   const $ = (window as Window & { jQuery?: (element: HTMLElement) => { flipBook: (source: string[], options: Record<string, unknown>) => unknown } }).jQuery
   if (!$) return
   dearFlipElement.value.replaceChildren()
