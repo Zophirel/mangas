@@ -50,6 +50,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@dearhive/dearflip-jquery-flipbook':
+        specifier: 1.7.3
+        version: 1.7.3
       '@manga/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -183,6 +186,9 @@ packages:
   '@babel/types@7.29.8':
     resolution: {integrity: sha512-Vj1jF3cPfxg7OAfoI7QnVKLoILlm2JF9pnVHrX8qx7AHMiYWT+NDAA7jChlNgRS4WTLc/fD1lXLmPixluj+3Gg==}
     engines: {node: '>=6.9.0'}
+
+  '@dearhive/dearflip-jquery-flipbook@1.7.3':
+    resolution: {integrity: sha512-sfhDEUmTB2LjECCquMzyr6LF5CSSSdiFnWtaivKuXh5ilpFXpLJDU0+NYrUE6a0fyj5BGi2OLnl2GIjnPjTJPQ==}
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -2591,6 +2597,8 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
+
+  '@dearhive/dearflip-jquery-flipbook@1.7.3': {}
 
   '@drizzle-team/brocli@0.10.2': {}
 
