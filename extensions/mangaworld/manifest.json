@@ -1,0 +1,12 @@
+{
+  "id": "mangaworld",
+  "name": "MangaWorld",
+  "lang": "it",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "baseUrl": "https://www.mangaworld.mx",
+  "permissions": {
+    "network": ["www.mangaworld.mx", "cdn.mangaworld.mx"],
+    "filesystem": false
+  }
+}

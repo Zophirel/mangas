@@ -1,0 +1,12 @@
+{
+  "name": "@manga/source-mangafire",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "tsc", "typecheck": "tsc --noEmit" },
+  "dependencies": {
+    "@manga/extension-sdk": "workspace:*",
+    "@manga/shared": "workspace:*"
+  },
+  "devDependencies": { "@types/node": "^22.0.0", "typescript": "^5.6.3" }
+}

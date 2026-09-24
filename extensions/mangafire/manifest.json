@@ -1,0 +1,9 @@
+{
+  "id": "mangafire",
+  "name": "MangaFire",
+  "lang": "en",
+  "version": "0.1.0",
+  "entry": "dist/index.js",
+  "baseUrl": "https://mangafire.to",
+  "permissions": { "network": ["mangafire.to", "*.mfcdn.nl"], "filesystem": false }
+}
