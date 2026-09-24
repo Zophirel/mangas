@@ -57,3 +57,5 @@
 .source-select { border: 1px solid #e9e2dc; border-radius: 8px; background: #fff; color: #453f39; padding: 11px 14px; font: inherit; font-size: 12px; }
 .spinner { width: 12px; height: 12px; border: 2px solid #f0cdbf; border-top-color: #e87545; border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.dearflip-reader { width: min(100%, 1180px); height: min(72vh, 820px); margin: 0 auto; background: #201d1b; border-radius: 10px; overflow: hidden; }
+.dearflip-credit { margin: 14px 0 0; color: #9a9189; font-size: 10px; text-align: center; }

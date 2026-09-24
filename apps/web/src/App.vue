@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 type View = 'library' | 'search' | 'downloads' | 'settings' | 'detail' | 'reader'
 type Manga = { id: string; title: string; author: string; status: string; genre: string; cover: string; progress: number; chapters: number; description: string; source: string }
@@ -46,6 +46,7 @@ const readerLoading = ref(false)
 const readerError = ref('')
 const readerNotice = ref('')
 const readerSettingsOpen = ref(false)
+const dearFlipElement = ref<HTMLElement>()
 const readingDirection = ref<'ltr' | 'rtl'>(localStorage.getItem('mangrove-reading-direction') === 'rtl' ? 'rtl' : 'ltr')
 const pageMode = ref<'single' | 'double'>(localStorage.getItem('mangrove-page-mode') === 'double' ? 'double' : 'single')
 const chapterCache = new Map<string, Chapter[]>()
@@ -79,6 +80,14 @@ const navItems: { label: string; icon: string; view: View }[] = [
 ]
 const catalogItems = computed(() => catalogLoaded.value ? remoteManga.value : filteredManga.value)
 const sourceName = computed(() => ({ mangaworld: 'MangaWorld', mangafire: 'MangaFire', atsu: 'Atsumaru' })[selectedSource.value])
+async function renderDearFlip() {
+  if (pageMode.value !== 'double' || !dearFlipElement.value || !readerPages.value.length) return
+  await nextTick()
+  const $ = (window as Window & { jQuery?: (element: HTMLElement) => { flipBook: (source: string[], options: Record<string, unknown>) => unknown } }).jQuery
+  if (!$) return
+  dearFlipElement.value.replaceChildren()
+  $(dearFlipElement.value).flipBook(readerPages.value.map((page) => page.imageUrl), { webgl: false, height: '100%', duration: 550, soundEnable: false, showDownloadControl: false, hideControls: 'download,share,thumbnail,outline' })
+}
 function go(view: View, id?: string) { if (id) selectedId.value = id; currentView.value = view; sidebarOpen.value = false; window.location.hash = id ? `${view}/${encodeURIComponent(id)}` : view }
 function openManga(id: string) { chapterItems.value = []; chapterError.value = ''; readerPages.value = []; activeChapter.value = undefined; go('detail', id) }
 function continueReading(item: Manga) { go('reader', item.id) }
@@ -200,7 +209,9 @@ watch([readingDirection, pageMode], ([direction, mode]) => {
 })
 watch(pageMode, (mode) => {
   if (mode === 'double') currentPageIndex.value = Math.floor(currentPageIndex.value / 2) * 2
+  void renderDearFlip()
 })
+watch(readerPages, () => { void renderDearFlip() })
 watch([currentView, selectedId], ([view, id]) => {
   if (view !== 'detail' && view !== 'reader' || !['mangaworld:', 'mangafire:', 'atsu:'].some((prefix) => id.startsWith(prefix))) return
   if (view === 'detail') {
@@ -251,12 +262,13 @@ watch([searchQuery, selectedSource], () => { if (currentView.value === 'search')
             <div v-if="readerLoading" class="reader-message">Carico le pagine…</div>
             <div v-else-if="readerError" class="reader-message error">{{ readerError }}</div>
             <template v-else-if="visibleReaderPages.length">
-              <div class="reader-page-stage" :class="[`mode-${pageMode}`, `direction-${readingDirection}`]">
+              <div v-if="pageMode === 'double'" ref="dearFlipElement" class="dearflip-reader" />
+              <div v-else class="reader-page-stage" :class="[`mode-${pageMode}`, `direction-${readingDirection}`]">
                 <div v-for="page in visibleReaderPages" :key="page.index" class="reader-page-frame"><img class="reader-page-image" :src="page.imageUrl" :alt="`${selectedManga.title} - ${activeChapter?.name} - pagina ${page.index + 1}`" @error="readerError = 'Impossibile caricare questa pagina.'" /></div>
                 <button class="reader-click-zone left" :aria-label="readingDirection === 'ltr' ? 'Vai alla pagina precedente' : 'Vai alla pagina successiva'" @click="changePageFromSide('left')" />
                 <button class="reader-click-zone right" :aria-label="readingDirection === 'ltr' ? 'Vai alla pagina successiva' : 'Vai alla pagina precedente'" @click="changePageFromSide('right')" />
               </div>
-              <div class="reader-controls"><button class="outline-button" :disabled="currentPageIndex === 0" @click="changePage(-1)">← Pagina precedente</button><span>{{ readerPageLabel }}</span><button class="outline-button" :disabled="readerIsAtEnd && !nextChapter" @click="changePage(1)">{{ readerIsAtEnd ? nextChapter ? 'Capitolo successivo →' : 'Ultimo capitolo' : 'Pagina successiva →' }}</button></div>
+              <div v-if="pageMode === 'single'" class="reader-controls"><button class="outline-button" :disabled="currentPageIndex === 0" @click="changePage(-1)">← Pagina precedente</button><span>{{ readerPageLabel }}</span><button class="outline-button" :disabled="readerIsAtEnd && !nextChapter" @click="changePage(1)">{{ readerIsAtEnd ? nextChapter ? 'Capitolo successivo →' : 'Ultimo capitolo' : 'Pagina successiva →' }}</button></div><p v-else class="dearflip-credit">Double page view powered by DearFlip</p>
               <p v-if="readerNotice" class="reader-message">{{ readerNotice }}</p>
             </template>
             <div v-else-if="!['mangaworld:', 'mangafire:', 'atsu:'].some((prefix) => selectedManga.id.startsWith(prefix))" class="reader-image" :style="{ backgroundImage: `url(${selectedManga.cover})` }"><div class="reader-overlay">La lettura demo non è collegata a una fonte.<br /><span>Apri un manga dal catalogo.</span></div></div>
