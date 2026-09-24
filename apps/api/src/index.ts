@@ -91,7 +91,7 @@ app.get('/api/images', async (req, reply) => {
   const { url } = MangaFireImageQuery.parse(req.query)
   const imageUrl = new URL(url)
   const host = imageUrl.hostname.toLowerCase()
-  const allowedHost = host === 'mfcdn1.xyz' || host.endsWith('.mfcdn1.xyz') || host === 'mfcdn.nl' || host.endsWith('.mfcdn.nl')
+  const allowedHost = /^(?:[a-z0-9-]+\.)?mfcdn\d+\.xyz$/.test(host) || host === 'mfcdn.nl' || host.endsWith('.mfcdn.nl')
   if (!allowedHost) return reply.code(400).send({ error: 'image_host_not_allowed' })
   const response = await fetch(imageUrl, {
     headers: {
